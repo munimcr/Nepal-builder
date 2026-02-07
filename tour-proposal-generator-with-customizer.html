@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoZayaan Tour Proposal Generator - With PDF Customizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --gozayaan-primary: #00026E;
+            --gozayaan-dark: #000150;
+            --gozayaan-light: #E8E8F5;
+            --gozayaan-accent: #FF6B35;
+            --text-dark: #1a1a1a;
+            --text-gray: #555;
+            --border-color: #e0e0e0;
+            --bg-light: #fafafa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 400px;
+            gap: 20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 2, 110, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gozayaan-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: '✈';
+            font-size: 32px;
+        }
+
+        .tagline {
+            color: var(--text-gray);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--gozayaan-primary);
+            color: white;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .form-panel, .preview-panel, .customizer-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gozayaan-dark);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--gozayaan-primary);
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gozayaan-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--gozayaan-primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gozayaan-primary);
+            box-shadow: 0 0 0 3px rgba(0, 2, 110, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--gozayaan-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--gozayaan-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 2, 110, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gozayaan-accent);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--gozayaan-primary);
+            border: 2px solid var(--gozayaan-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--gozayaan-light);
+        }
+
+        .btn-small {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+
+        .itinerary-day {
+            background: var(--bg-light);
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--gozayaan-primary);
+            transition: all 0.3s ease;
+        }
+
+        .itinerary-day:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: var(--gozayaan-primary);
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            background: var(--bg-light);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: var(--gozayaan-light);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* PDF Customizer Styles */
+        .customizer-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 10px;
+        }
+
+        .customizer-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gozayaan-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customizer-section h4::before {
+            content: '⚙️';
+            font-size: 16px;
+        }
+
+        .color-picker-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .color-picker-group input[type="color"] {
+            width: 50px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .color-picker-group label {
+            flex: 1;
+            margin: 0;
+        }
+
+        .slider-group {
+            margin-bottom: 15px;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: var(--gozayaan-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .preset-btn {
+            padding: 8px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--gozayaan-primary);
+            background: var(--gozayaan-light);
+        }
+
+        .preview-content {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .download-section {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 15px 0;
+            border-top: 2px solid var(--border-color);
+            margin-top: 15px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            color: var(--gozayaan-primary);
+            font-weight: 600;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        /* Hide/Show panels based on active tab */
+        .form-panel.hidden, .customizer-panel.hidden {
+            display: none;
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .customizer-panel {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: var(--text-gray);
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .template-preview {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            background: white;
+        }
+
+        .template-preview h5 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gozayaan-dark);
+        }
+
+        .template-preview-box {
+            background: var(--bg-light);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="logo">GoZayaan</div>
+                <div class="tagline">Tour Proposal Generator with PDF Customizer</div>
+            </div>
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('form')">📝 Form</button>
+                <button class="tab-btn" onclick="switchTab('customize')">🎨 Customize PDF</button>
+            </div>
+        </div>
+
+        <div class="form-panel" id="formPanel">
+            <h2 class="panel-title">Tour Details</h2>
+            
+            <form id="proposalForm">
+                <div class="form-section">
+                    <div class="section-title">Basic Information</div>
+                    
+                    <div class="form-group">
+                        <label>Tour Name *</label>
+                        <input type="text" id="tourName" required value="Nepal Tour Package 7 Days & 6 Nights">
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Customer Name *</label>
+                            <input type="text" id="customerName" required value="Saurav Biswas">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="phoneNumber" required value="1833184362">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="emailAddress" required value="hi.sauraav@gmail.com">
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Journey Date *</label>
+                            <input type="date" id="journeyDate" required value="2026-02-17">
+                        </div>
+                        <div class="form-group">
+                            <label>Return Date *</label>
+                            <input type="date" id="returnDate" required value="2026-02-23">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Travelers & Pricing</div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Number of Adults *</label>
+                            <input type="number" id="adults" min="0" value="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Children</label>
+                            <input type="number" id="children" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Package Price (BDT) *</label>
+                            <input type="number" id="packagePrice" required value="155250">
+                        </div>
+                        <div class="form-group">
+                            <label>Discount (BDT)</label>
+                            <input type="number" id="discount" value="20250">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact Person</label>
+                        <input type="text" id="contactPerson" value="Nafis - 01325087570">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Tour Description</div>
+                    
+                    <div class="form-group">
+                        <label>Tour Tagline</label>
+                        <input type="text" id="tourTagline" value="Embark on an Unforgettable Journey to the Land of the Himalayas">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tour Description</label>
+                        <textarea id="tourDescription" rows="4">Discover the Magic of Nepal! Stunning panoramic views of the world's highest mountains, peaceful boat rides on pristine lakes, and the rich tapestry of ancient traditions unfolding before you.</textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Package Includes</div>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="include-checkbox" value="Flight Tickets: DAC - KTM - DAC" checked>
+                            <span>Flight Tickets</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="include-checkbox" value="Accommodation in hotels" checked>
+                            <span>Accommodation</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="include-checkbox" value="Meal: Breakfast" checked>
+                            <span>Breakfast</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="include-checkbox" value="All transfers and tours as per itinerary" checked>
+                            <span>Transfers & Tours</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Package Excludes</div>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="exclude-checkbox" value="Visa Fee" checked>
+                            <span>Visa Fee</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="exclude-checkbox" value="Personal expenses and tips" checked>
+                            <span>Personal Expenses</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="exclude-checkbox" value="Monument entrance fees" checked>
+                            <span>Entrance Fees</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" class="exclude-checkbox" value="Travel insurance" checked>
+                            <span>Insurance</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Daily Itinerary</div>
+                    <div id="itineraryContainer"></div>
+                    <button type="button" class="btn btn-outline btn-small" onclick="addItineraryDay()">+ Add Day</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="customizer-panel hidden" id="customizerPanel">
+            <h2 class="panel-title">PDF Customization</h2>
+
+            <div class="customizer-section">
+                <h4>Colors</h4>
+                <div class="color-picker-group">
+                    <input type="color" id="pdfPrimaryColor" value="#00026E">
+                    <label>Primary Color (Headers, Titles)</label>
+                </div>
+                <div class="color-picker-group">
+                    <input type="color" id="pdfAccentColor" value="#FF6B35">
+                    <label>Accent Color (Highlights)</label>
+                </div>
+                <div class="color-picker-group">
+                    <input type="color" id="pdfTextColor" value="#000000">
+                    <label>Text Color</label>
+                </div>
+            </div>
+
+            <div class="customizer-section">
+                <h4>Font Settings</h4>
+                <div class="form-group">
+                    <label>Header Font Size <span class="slider-value" id="headerSizeValue">18</span></label>
+                    <input type="range" id="headerFontSize" min="14" max="24" value="18" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Body Font Size <span class="slider-value" id="bodySizeValue">10</span></label>
+                    <input type="range" id="bodyFontSize" min="8" max="14" value="10" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Title Font Size <span class="slider-value" id="titleSizeValue">14</span></label>
+                    <input type="range" id="titleFontSize" min="12" max="18" value="14" step="1">
+                </div>
+            </div>
+
+            <div class="customizer-section">
+                <h4>Spacing & Layout</h4>
+                <div class="form-group">
+                    <label>Section Spacing <span class="slider-value" id="spacingValue">10</span></label>
+                    <input type="range" id="sectionSpacing" min="5" max="20" value="10" step="1">
+                    <p class="help-text">Space between sections</p>
+                </div>
+                <div class="form-group">
+                    <label>Page Margins <span class="slider-value" id="marginValue">20</span></label>
+                    <input type="range" id="pageMargin" min="15" max="30" value="20" step="1">
+                    <p class="help-text">Left and right page margins</p>
+                </div>
+            </div>
+
+            <div class="customizer-section">
+                <h4>Header Style</h4>
+                <div class="form-group">
+                    <label>Header Height <span class="slider-value" id="headerHeightValue">40</span></label>
+                    <input type="range" id="headerHeight" min="30" max="60" value="40" step="5">
+                </div>
+                <div class="form-group">
+                    <label>Show Company Logo in Header</label>
+                    <select id="showLogo">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="customizer-section">
+                <h4>Quick Presets</h4>
+                <p class="help-text">Apply pre-designed styles instantly</p>
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="applyPreset('modern')">🎯 Modern</button>
+                    <button class="preset-btn" onclick="applyPreset('classic')">📘 Classic</button>
+                    <button class="preset-btn" onclick="applyPreset('minimal')">⚪ Minimal</button>
+                    <button class="preset-btn" onclick="applyPreset('bold')">💪 Bold</button>
+                </div>
+            </div>
+
+            <div class="customizer-section">
+                <h4>Preview Settings</h4>
+                <div class="template-preview">
+                    <h5>Current Configuration:</h5>
+                    <div class="template-preview-box" id="configPreview">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+
+            <div class="download-section">
+                <button class="btn btn-outline" onclick="resetToDefault()" style="width: 100%; margin-bottom: 10px;">
+                    🔄 Reset to Default
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <h2 class="panel-title">Preview</h2>
+            <div id="previewContent" class="preview-content"></div>
+            
+            <div class="download-section">
+                <div class="loading" id="loading">Generating PDF...</div>
+                <button class="btn btn-primary" onclick="generatePDF()" style="width: 100%;">
+                    📄 Download PDF Proposal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let itineraryDays = [
+            {
+                day: 1,
+                date: '2026-02-17',
+                location: 'Kathmandu',
+                hotel: 'Hotel Surya Heritage',
+                roomType: 'Deluxe',
+                nights: 1,
+                activities: 'Arrival, Transfer to Hotel, stay'
+            },
+            {
+                day: 2,
+                date: '2026-02-18',
+                location: 'Pokhara',
+                hotel: 'Majestic Lake Front & Suites',
+                roomType: 'Deluxe',
+                nights: 3,
+                activities: 'Breakfast at hotel, transfer to Pokhara, stay'
+            }
+        ];
+
+        // PDF Customization Settings
+        let pdfSettings = {
+            primaryColor: '#00026E',
+            accentColor: '#FF6B35',
+            textColor: '#000000',
+            headerFontSize: 18,
+            bodyFontSize: 10,
+            titleFontSize: 14,
+            sectionSpacing: 10,
+            pageMargin: 20,
+            headerHeight: 40,
+            showLogo: true
+        };
+
+        function switchTab(tab) {
+            const formPanel = document.getElementById('formPanel');
+            const customizerPanel = document.getElementById('customizerPanel');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            if (tab === 'form') {
+                formPanel.classList.remove('hidden');
+                customizerPanel.classList.add('hidden');
+                tabButtons[0].classList.add('active');
+            } else {
+                formPanel.classList.add('hidden');
+                customizerPanel.classList.remove('hidden');
+                tabButtons[1].classList.add('active');
+                updateConfigPreview();
+            }
+        }
+
+        function updatePdfSettings() {
+            pdfSettings.primaryColor = document.getElementById('pdfPrimaryColor').value;
+            pdfSettings.accentColor = document.getElementById('pdfAccentColor').value;
+            pdfSettings.textColor = document.getElementById('pdfTextColor').value;
+            pdfSettings.headerFontSize = parseInt(document.getElementById('headerFontSize').value);
+            pdfSettings.bodyFontSize = parseInt(document.getElementById('bodyFontSize').value);
+            pdfSettings.titleFontSize = parseInt(document.getElementById('titleFontSize').value);
+            pdfSettings.sectionSpacing = parseInt(document.getElementById('sectionSpacing').value);
+            pdfSettings.pageMargin = parseInt(document.getElementById('pageMargin').value);
+            pdfSettings.headerHeight = parseInt(document.getElementById('headerHeight').value);
+            pdfSettings.showLogo = document.getElementById('showLogo').value === 'yes';
+            
+            updateConfigPreview();
+        }
+
+        function updateConfigPreview() {
+            const preview = document.getElementById('configPreview');
+            preview.innerHTML = `
+Primary: ${pdfSettings.primaryColor}
+Accent: ${pdfSettings.accentColor}
+Header Size: ${pdfSettings.headerFontSize}pt
+Body Size: ${pdfSettings.bodyFontSize}pt
+Margins: ${pdfSettings.pageMargin}mm
+            `.trim();
+        }
+
+        function applyPreset(preset) {
+            const presets = {
+                modern: {
+                    primaryColor: '#00026E',
+                    accentColor: '#FF6B35',
+                    textColor: '#000000',
+                    headerFontSize: 18,
+                    bodyFontSize: 10,
+                    titleFontSize: 14,
+                    sectionSpacing: 10,
+                    pageMargin: 20,
+                    headerHeight: 40,
+                    showLogo: true
+                },
+                classic: {
+                    primaryColor: '#1a1a1a',
+                    accentColor: '#8B4513',
+                    textColor: '#000000',
+                    headerFontSize: 16,
+                    bodyFontSize: 11,
+                    titleFontSize: 13,
+                    sectionSpacing: 12,
+                    pageMargin: 25,
+                    headerHeight: 35,
+                    showLogo: true
+                },
+                minimal: {
+                    primaryColor: '#333333',
+                    accentColor: '#666666',
+                    textColor: '#000000',
+                    headerFontSize: 16,
+                    bodyFontSize: 9,
+                    titleFontSize: 12,
+                    sectionSpacing: 8,
+                    pageMargin: 20,
+                    headerHeight: 30,
+                    showLogo: false
+                },
+                bold: {
+                    primaryColor: '#D32F2F',
+                    accentColor: '#FFA000',
+                    textColor: '#000000',
+                    headerFontSize: 20,
+                    bodyFontSize: 11,
+                    titleFontSize: 16,
+                    sectionSpacing: 12,
+                    pageMargin: 18,
+                    headerHeight: 50,
+                    showLogo: true
+                }
+            };
+
+            pdfSettings = {...presets[preset]};
+            
+            // Update all inputs
+            document.getElementById('pdfPrimaryColor').value = pdfSettings.primaryColor;
+            document.getElementById('pdfAccentColor').value = pdfSettings.accentColor;
+            document.getElementById('pdfTextColor').value = pdfSettings.textColor;
+            document.getElementById('headerFontSize').value = pdfSettings.headerFontSize;
+            document.getElementById('bodyFontSize').value = pdfSettings.bodyFontSize;
+            document.getElementById('titleFontSize').value = pdfSettings.titleFontSize;
+            document.getElementById('sectionSpacing').value = pdfSettings.sectionSpacing;
+            document.getElementById('pageMargin').value = pdfSettings.pageMargin;
+            document.getElementById('headerHeight').value = pdfSettings.headerHeight;
+            document.getElementById('showLogo').value = pdfSettings.showLogo ? 'yes' : 'no';
+            
+            updateSliderValues();
+            updateConfigPreview();
+        }
+
+        function resetToDefault() {
+            applyPreset('modern');
+        }
+
+        function updateSliderValues() {
+            document.getElementById('headerSizeValue').textContent = pdfSettings.headerFontSize;
+            document.getElementById('bodySizeValue').textContent = pdfSettings.bodyFontSize;
+            document.getElementById('titleSizeValue').textContent = pdfSettings.titleFontSize;
+            document.getElementById('spacingValue').textContent = pdfSettings.sectionSpacing;
+            document.getElementById('marginValue').textContent = pdfSettings.pageMargin;
+            document.getElementById('headerHeightValue').textContent = pdfSettings.headerHeight;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 0, g: 0, b: 0};
+        }
+
+        function renderItinerary() {
+            const container = document.getElementById('itineraryContainer');
+            container.innerHTML = '';
+            
+            itineraryDays.forEach((day, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'itinerary-day';
+                dayDiv.innerHTML = `
+                    <div class="day-header">
+                        <span class="day-number">Day ${day.day}</span>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="removeDay(${index})">Remove</button>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" value="${day.date}" onchange="updateDay(${index}, 'date', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" value="${day.location}" onchange="updateDay(${index}, 'location', this.value)">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Hotel Name</label>
+                            <input type="text" value="${day.hotel}" onchange="updateDay(${index}, 'hotel', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Room Type</label>
+                            <input type="text" value="${day.roomType}" onchange="updateDay(${index}, 'roomType', this.value)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Nights</label>
+                        <input type="number" min="0" value="${day.nights}" onchange="updateDay(${index}, 'nights', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Activities</label>
+                        <textarea rows="2" onchange="updateDay(${index}, 'activities', this.value)">${day.activities}</textarea>
+                    </div>
+                `;
+                container.appendChild(dayDiv);
+            });
+            updatePreview();
+        }
+
+        function addItineraryDay() {
+            const lastDay = itineraryDays[itineraryDays.length - 1];
+            const nextDate = new Date(lastDay.date);
+            nextDate.setDate(nextDate.getDate() + 1);
+            
+            itineraryDays.push({
+                day: itineraryDays.length + 1,
+                date: nextDate.toISOString().split('T')[0],
+                location: '',
+                hotel: '',
+                roomType: 'Deluxe',
+                nights: 1,
+                activities: ''
+            });
+            renderItinerary();
+        }
+
+        function removeDay(index) {
+            if (itineraryDays.length > 1) {
+                itineraryDays.splice(index, 1);
+                itineraryDays.forEach((day, i) => {
+                    day.day = i + 1;
+                });
+                renderItinerary();
+            }
+        }
+
+        function updateDay(index, field, value) {
+            itineraryDays[index][field] = value;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const tourName = document.getElementById('tourName').value;
+            const customerName = document.getElementById('customerName').value;
+            
+            let previewHTML = `
+                <div style="text-align: center; padding-bottom: 15px; border-bottom: 2px solid var(--gozayaan-primary); margin-bottom: 20px;">
+                    <div style="font-family: Poppins, sans-serif; font-size: 22px; font-weight: 700; color: var(--gozayaan-dark); margin-bottom: 8px;">${tourName}</div>
+                    <div style="color: var(--text-gray); font-size: 13px; font-style: italic;">Prepared for ${customerName}</div>
+                </div>
+                <p style="text-align: center; color: var(--text-gray); font-size: 12px;">Preview shows approximate layout. Download PDF to see final result with your custom styling.</p>
+            `;
+
+            document.getElementById('previewContent').innerHTML = previewHTML;
+        }
+
+        async function generatePDF() {
+            const loading = document.getElementById('loading');
+            loading.classList.add('active');
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const tourName = document.getElementById('tourName').value;
+                const customerName = document.getElementById('customerName').value;
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const emailAddress = document.getElementById('emailAddress').value;
+                const journeyDate = document.getElementById('journeyDate').value;
+                const returnDate = document.getElementById('returnDate').value;
+                const adults = document.getElementById('adults').value;
+                const children = document.getElementById('children').value;
+                const packagePrice = parseFloat(document.getElementById('packagePrice').value) || 0;
+                const discount = parseFloat(document.getElementById('discount').value) || 0;
+                const finalPrice = packagePrice - discount;
+                const contactPerson = document.getElementById('contactPerson').value;
+                const tourTagline = document.getElementById('tourTagline').value;
+                const tourDescription = document.getElementById('tourDescription').value;
+
+                const includes = Array.from(document.querySelectorAll('.include-checkbox:checked')).map(cb => cb.value);
+                const excludes = Array.from(document.querySelectorAll('.exclude-checkbox:checked')).map(cb => cb.value);
+
+                let y = pdfSettings.headerHeight + 5;
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = pdfSettings.pageMargin;
+                const maxWidth = pageWidth - 2 * margin;
+
+                const primaryRgb = hexToRgb(pdfSettings.primaryColor);
+                const accentRgb = hexToRgb(pdfSettings.accentColor);
+                const textRgb = hexToRgb(pdfSettings.textColor);
+
+                // Header
+                doc.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.rect(0, 0, pageWidth, pdfSettings.headerHeight, 'F');
+                
+                if (pdfSettings.showLogo) {
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(pdfSettings.headerFontSize + 4);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('GoZayaan', margin, pdfSettings.headerHeight / 2 + 2);
+                    doc.setFontSize(pdfSettings.bodyFontSize);
+                    doc.setFont(undefined, 'normal');
+                    doc.text('www.gozayaan.com', margin, pdfSettings.headerHeight / 2 + 10);
+                }
+
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+
+                // Tour Name
+                doc.setFontSize(pdfSettings.headerFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text(tourName, margin, y);
+                y += pdfSettings.sectionSpacing;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'italic');
+                doc.setTextColor(85, 85, 85);
+                const taglineLines = doc.splitTextToSize(tourTagline, maxWidth);
+                doc.text(taglineLines, margin, y);
+                y += taglineLines.length * 5 + pdfSettings.sectionSpacing;
+
+                // Customer Info
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('Proposal prepared for:', margin, y);
+                y += 7;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+                doc.text(`Name: ${customerName}`, margin, y);
+                y += 5;
+                doc.text(`Phone: ${phoneNumber}`, margin, y);
+                y += 5;
+                doc.text(`Email: ${emailAddress}`, margin, y);
+                y += pdfSettings.sectionSpacing;
+
+                // Tour Details
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('Tour Details:', margin, y);
+                y += 7;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+                doc.text(`Journey: ${new Date(journeyDate).toLocaleDateString()}`, margin, y);
+                doc.text(`Return: ${new Date(returnDate).toLocaleDateString()}`, pageWidth/2, y);
+                y += 5;
+                doc.text(`Travelers: ${parseInt(adults) + parseInt(children)} (Adults: ${adults}, Children: ${children})`, margin, y);
+                y += pdfSettings.sectionSpacing;
+
+                // Pricing Box
+                doc.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.roundedRect(margin, y, maxWidth, 20, 3, 3, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(pdfSettings.bodyFontSize + 1);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Package: BDT ${packagePrice.toLocaleString()}`, margin + 5, y + 7);
+                doc.text(`Discount: BDT ${discount.toLocaleString()}`, margin + 5, y + 13);
+                doc.setFontSize(pdfSettings.bodyFontSize + 2);
+                doc.text(`Final Price: BDT ${finalPrice.toLocaleString()}`, pageWidth - margin - 60, y + 13);
+                y += 25 + pdfSettings.sectionSpacing;
+
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+
+                // Description
+                if (y > 230) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('About This Tour:', margin, y);
+                y += 7;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(85, 85, 85);
+                const descLines = doc.splitTextToSize(tourDescription, maxWidth);
+                doc.text(descLines, margin, y);
+                y += descLines.length * 4 + pdfSettings.sectionSpacing;
+
+                // Package Includes
+                if (y > 240) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('Package Includes:', margin, y);
+                y += 7;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+                includes.forEach(item => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text('✓ ' + item, margin, y);
+                    y += 5;
+                });
+                y += pdfSettings.sectionSpacing;
+
+                // Package Excludes
+                if (y > 240) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('Package Excludes:', margin, y);
+                y += 7;
+
+                doc.setFontSize(pdfSettings.bodyFontSize);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+                excludes.forEach(item => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text('✗ ' + item, margin, y);
+                    y += 5;
+                });
+                y += pdfSettings.sectionSpacing;
+
+                // Itinerary
+                if (y > 220) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(pdfSettings.titleFontSize);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                doc.text('Daily Itinerary:', margin, y);
+                y += pdfSettings.sectionSpacing;
+
+                itineraryDays.forEach((day) => {
+                    if (y > 240) {
+                        doc.addPage();
+                        y = 20;
+                    }
+
+                    doc.setFillColor(248, 250, 250);
+                    doc.roundedRect(margin, y - 5, maxWidth, 22, 2, 2, 'F');
+                    
+                    doc.setFontSize(pdfSettings.bodyFontSize + 1);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+                    doc.text(`Day ${day.day} - ${new Date(day.date).toLocaleDateString()} - ${day.location}`, margin + 3, y);
+                    y += 5;
+
+                    doc.setFontSize(pdfSettings.bodyFontSize);
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+                    doc.text(`Hotel: ${day.hotel} (${day.roomType}) - ${day.nights} Night(s)`, margin + 3, y);
+                    y += 4;
+
+                    doc.setTextColor(85, 85, 85);
+                    const activityLines = doc.splitTextToSize(`${day.activities}`, maxWidth - 6);
+                    doc.text(activityLines, margin + 3, y);
+                    y += activityLines.length * 4 + 7;
+                });
+
+                // Footer
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(128, 128, 128);
+                    doc.text('For confirmation: tours@gozayaan.com', margin, doc.internal.pageSize.height - 10);
+                    doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin - 20, doc.internal.pageSize.height - 10);
+                }
+
+                const fileName = `${tourName.replace(/[^a-z0-9]/gi, '_')}_${customerName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+                doc.save(fileName);
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF. Please try again.');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderItinerary();
+            
+            // Add event listeners to all form inputs
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+
+            // Add event listeners to PDF customization inputs
+            document.getElementById('pdfPrimaryColor').addEventListener('change', updatePdfSettings);
+            document.getElementById('pdfAccentColor').addEventListener('change', updatePdfSettings);
+            document.getElementById('pdfTextColor').addEventListener('change', updatePdfSettings);
+            document.getElementById('headerFontSize').addEventListener('input', function() {
+                document.getElementById('headerSizeValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('bodyFontSize').addEventListener('input', function() {
+                document.getElementById('bodySizeValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('titleFontSize').addEventListener('input', function() {
+                document.getElementById('titleSizeValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('sectionSpacing').addEventListener('input', function() {
+                document.getElementById('spacingValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('pageMargin').addEventListener('input', function() {
+                document.getElementById('marginValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('headerHeight').addEventListener('input', function() {
+                document.getElementById('headerHeightValue').textContent = this.value;
+                updatePdfSettings();
+            });
+            document.getElementById('showLogo').addEventListener('change', updatePdfSettings);
+
+            updateSliderValues();
+            updateConfigPreview();
+        });
+    </script>
+</body>
+</html>
